@@ -33,17 +33,12 @@ npm run backend
 
 ## GitHub Pages 部署
 
-项目已配置 GitHub Actions 自动部署。推送到 `main` 分支后，GitHub 会自动构建静态站点并发布到 Pages。
+项目已配置 GitHub Pages 分支部署。线上版本使用随代码发布的缓存赔率和模型预测；本地开发仍可通过 `.env.local` 接入 The Odds API。
 
-首次上线：
+发布或更新线上页面：
 
 ```bash
-git init
-git add .
-git commit -m "Initial GitHub Pages deploy"
-gh repo create world-cup-ai-odds-dashboard --public --source=. --remote=origin --push
+./scripts/deploy-github-pages.sh
 ```
 
-然后在 GitHub 仓库的 `Settings -> Pages` 中，把 `Build and deployment` 的 `Source` 设为 `GitHub Actions`。之后每次提交并推送到 `main`，在线页面都会自动更新。
-
-线上版本使用随代码发布的缓存赔率和模型预测；本地开发仍可通过 `.env.local` 接入 The Odds API。
+脚本会推送当前分支到 GitHub，按仓库路径构建静态站点，把 `out/` 发布到 `gh-pages` 分支，并确保 Pages 从该分支根目录发布。
