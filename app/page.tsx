@@ -33,8 +33,12 @@ const timezones = [
 
 const stageLabels: Record<string, string> = {
   "Group Stage": "小组赛",
+  "Round of 32": "32 强",
   "Round of 16": "16 强",
-  Quarterfinal: "1/4 决赛"
+  Quarterfinal: "1/4 决赛",
+  Semifinal: "半决赛",
+  "Third-place Match": "三四名决赛",
+  Final: "决赛"
 };
 
 const groupLabels: Record<string, string> = {
@@ -43,7 +47,13 @@ const groupLabels: Record<string, string> = {
   "Group C": "C 组",
   "Group E": "E 组",
   "Group F": "F 组",
-  "Group H": "H 组"
+  "Group G": "G 组",
+  "Group H": "H 组",
+  "Group I": "I 组",
+  "Group J": "J 组",
+  "Group K": "K 组",
+  "Group L": "L 组",
+  Knockout: "淘汰赛"
 };
 
 const statusLabels: Record<MatchStatus, string> = {
@@ -72,6 +82,43 @@ const teamNameLabels: Record<string, string> = {
   Tunisia: "突尼斯",
   Brazil: "巴西",
   Morocco: "摩洛哥",
+  Argentina: "阿根廷",
+  France: "法国",
+  Spain: "西班牙",
+  England: "英格兰",
+  Portugal: "葡萄牙",
+  Belgium: "比利时",
+  Croatia: "克罗地亚",
+  Uruguay: "乌拉圭",
+  "United States": "美国",
+  Colombia: "哥伦比亚",
+  Italy: "意大利",
+  Switzerland: "瑞士",
+  Denmark: "丹麦",
+  Senegal: "塞内加尔",
+  Austria: "奥地利",
+  Iran: "伊朗",
+  "Korea Republic": "韩国",
+  Australia: "澳大利亚",
+  Serbia: "塞尔维亚",
+  Poland: "波兰",
+  Turkey: "土耳其",
+  Ukraine: "乌克兰",
+  Canada: "加拿大",
+  Norway: "挪威",
+  Czechia: "捷克",
+  Egypt: "埃及",
+  Algeria: "阿尔及利亚",
+  Nigeria: "尼日利亚",
+  Panama: "巴拿马",
+  Paraguay: "巴拉圭",
+  Chile: "智利",
+  Peru: "秘鲁",
+  Qatar: "卡塔尔",
+  "Saudi Arabia": "沙特阿拉伯",
+  Ghana: "加纳",
+  "Costa Rica": "哥斯达黎加",
+  "New Zealand": "新西兰",
   Draw: "平局"
 };
 
@@ -81,7 +128,17 @@ const cityLabels: Record<string, string> = {
   Philadelphia: "费城",
   Dallas: "达拉斯",
   Vancouver: "温哥华",
-  Miami: "迈阿密"
+  Miami: "迈阿密",
+  "Los Angeles": "洛杉矶",
+  Seattle: "西雅图",
+  Atlanta: "亚特兰大",
+  "San Francisco Bay Area": "旧金山湾区",
+  Houston: "休斯敦",
+  Boston: "波士顿",
+  Toronto: "多伦多",
+  "Kansas City": "堪萨斯城",
+  Guadalajara: "瓜达拉哈拉",
+  Monterrey: "蒙特雷"
 };
 
 const factorLabels: Record<string, string> = {
@@ -699,8 +756,12 @@ export default function Page() {
             <select value={stage} onChange={(event) => setStage(event.target.value)}>
               <option value="All">全部阶段</option>
               <option value="Group Stage">小组赛</option>
+              <option value="Round of 32">32 强</option>
               <option value="Round of 16">16 强</option>
               <option value="Quarterfinal">1/4 决赛</option>
+              <option value="Semifinal">半决赛</option>
+              <option value="Third-place Match">三四名决赛</option>
+              <option value="Final">决赛</option>
             </select>
             <select value={team} onChange={(event) => setTeam(event.target.value)}>
               <option value="All">全部球队/小组</option>
