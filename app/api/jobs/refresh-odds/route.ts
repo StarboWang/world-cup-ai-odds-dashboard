@@ -6,7 +6,7 @@ export async function POST() {
   const data = buildDashboardData(odds);
   return Response.json({
     refreshedAt: data.lastRefresh,
-    source: odds.length > 0 ? "the-odds-api" : "cached-demo",
+    source: odds.length > 0 ? "the-odds-api" : "unavailable",
     snapshots: data.odds.length,
     bookmakerCount: data.odds.reduce((sum, snapshot) => sum + snapshot.bookmakers.length, 0)
   });

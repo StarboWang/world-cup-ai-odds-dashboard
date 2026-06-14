@@ -22,6 +22,7 @@ export interface Team {
 export interface Match {
   id: string;
   kickoff: string;
+  kickoffLabel?: string;
   venue: string;
   city: string;
   stage: string;

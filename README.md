@@ -10,7 +10,7 @@ cp .env.example .env.local
 npm run dev
 ```
 
-把 The Odds API key 放进 `.env.local` 的 `ODDS_API_KEY` 后，服务端 API 会优先拉取 `soccer_fifa_world_cup` 真实赔率。没有 key 或赛事暂未覆盖时，会使用缓存样例赔率保证看板可演示。
+把 The Odds API key 放进 `.env.local` 的 `ODDS_API_KEY` 后，服务端 API 会拉取 `soccer_fifa_world_cup` 真实赔率。没有 key 或赛事暂未覆盖时，页面只展示真实赛程和模型预测，收益模块会明确等待真实赔率源，不再使用样例盘口。
 
 可选 FastAPI 服务：
 
@@ -33,7 +33,7 @@ npm run backend
 
 ## GitHub Pages 部署
 
-项目已配置 GitHub Pages 分支部署。线上版本使用随代码发布的缓存赔率和模型预测；本地开发仍可通过 `.env.local` 接入 The Odds API。
+项目已配置 GitHub Pages 分支部署。线上版本使用随代码发布的真实赛程快照和模型预测；本地开发仍可通过 `.env.local` 接入 The Odds API。
 
 发布或更新线上页面：
 

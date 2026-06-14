@@ -1,11 +1,8 @@
+import type { NextRequest } from "next/server";
 import { buildDashboardData, computeFairProbabilities } from "@/lib/model";
 import { fetchWorldCupOdds } from "@/lib/oddsApi";
 
-interface RouteContext {
-  params: Promise<{ id: string }>;
-}
-
-export async function GET(_request: Request, context: RouteContext) {
+export async function GET(_request: NextRequest, context: { params: Promise<{ id: string }> }) {
   const { id } = await context.params;
   const odds = await fetchWorldCupOdds();
   const data = buildDashboardData(odds);

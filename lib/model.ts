@@ -1,4 +1,4 @@
-import { DEMO_MATCHES, DEMO_ODDS, TEAMS } from "@/lib/data";
+import { DEMO_MATCHES, DEMO_ODDS, TEAMS, isPredictableMatch, isPlaceholderTeam } from "@/lib/data";
 import { runBacktest } from "@/lib/training";
 import type {
   BetTicket,
@@ -115,7 +115,7 @@ function gbdtBlend(match: Match, poissonHome: number, poissonDraw: number, poiss
 }
 
 export function generatePredictions(matches: Match[] = DEMO_MATCHES): PredictionSnapshot[] {
-  return matches.map((match) => {
+  return matches.filter(isPredictableMatch).map((match) => {
     const { homeXg, awayXg } = expectedGoals(match);
     const scores = scoreMatrix(homeXg, awayXg);
     const homeWin = scores.filter((score) => score.home > score.away).reduce((sum, score) => sum + score.probability, 0);
@@ -194,6 +194,7 @@ export function computeFairProbabilities(snapshot: OddsSnapshot): FairProbabilit
 }
 
 function probabilityForSelection(match: Match, prediction: PredictionSnapshot, selection: string) {
+  if (isPlaceholderTeam(match.homeTeam) || isPlaceholderTeam(match.awayTeam)) return 0;
   if (selection === match.homeTeam.name) return prediction.homeWinProbability;
   if (selection === match.awayTeam.name) return prediction.awayWinProbability;
   return prediction.drawProbability;
@@ -212,6 +213,7 @@ export function generateBets(matches: Match[], odds: OddsSnapshot[], predictions
   const bets: BetTicket[] = [];
 
   matches.forEach((match) => {
+    if (!isPredictableMatch(match)) return;
     const prediction = predictions.find((item) => item.matchId === match.id);
     const snapshot = odds.find((item) => item.matchId === match.id);
     if (!prediction || !snapshot) return;
@@ -337,7 +339,7 @@ export function generateTournamentProjection(matches: Match[], predictions: Pred
   return teams
     .map((team) => {
       const strength = Math.exp((team.rating.elo - 1600) / 310) / strengthTotal;
-      const relevant = matches.filter((match) => match.homeTeam.id === team.id || match.awayTeam.id === team.id);
+      const relevant = matches.filter((match) => isPredictableMatch(match) && (match.homeTeam.id === team.id || match.awayTeam.id === team.id));
       const matchEdge =
         relevant.reduce((sum, match) => {
           const prediction = predictions.find((item) => item.matchId === match.id);
@@ -367,7 +369,7 @@ export function generateTournamentProjection(matches: Match[], predictions: Pred
     .sort((a, b) => b.champion - a.champion);
 }
 
-export function buildDashboardData(inputOdds: OddsSnapshot[] = DEMO_ODDS): DashboardData {
+export function buildDashboardData(inputOdds: OddsSnapshot[] = []): DashboardData {
   const predictions = generatePredictions(DEMO_MATCHES);
   const odds = mergeOdds(DEMO_ODDS, inputOdds);
   const bets = generateBets(DEMO_MATCHES, odds, predictions);

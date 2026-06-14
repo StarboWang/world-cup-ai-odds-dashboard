@@ -45,6 +45,7 @@ const groupLabels: Record<string, string> = {
   "Group A": "A 组",
   "Group B": "B 组",
   "Group C": "C 组",
+  "Group D": "D 组",
   "Group E": "E 组",
   "Group F": "F 组",
   "Group G": "G 组",
@@ -72,8 +73,20 @@ const betStatusLabels: Record<BetStatus, string> = {
 const teamNameLabels: Record<string, string> = {
   Mexico: "墨西哥",
   "South Africa": "南非",
+  "South Korea": "韩国",
+  "Czech Republic": "捷克",
+  Canada: "加拿大",
+  "Bosnia and Herzegovina": "波黑",
+  "United States": "美国",
+  Paraguay: "巴拉圭",
+  Haiti: "海地",
+  Scotland: "苏格兰",
+  Australia: "澳大利亚",
+  Turkey: "土耳其",
+  Qatar: "卡塔尔",
+  Switzerland: "瑞士",
   Germany: "德国",
-  Curacao: "库拉索",
+  Curaçao: "库拉索",
   "Ivory Coast": "科特迪瓦",
   Ecuador: "厄瓜多尔",
   Netherlands: "荷兰",
@@ -83,41 +96,28 @@ const teamNameLabels: Record<string, string> = {
   Brazil: "巴西",
   Morocco: "摩洛哥",
   Argentina: "阿根廷",
+  Algeria: "阿尔及利亚",
   France: "法国",
   Spain: "西班牙",
+  "Cape Verde": "佛得角",
   England: "英格兰",
   Portugal: "葡萄牙",
   Belgium: "比利时",
   Croatia: "克罗地亚",
   Uruguay: "乌拉圭",
-  "United States": "美国",
   Colombia: "哥伦比亚",
-  Italy: "意大利",
-  Switzerland: "瑞士",
-  Denmark: "丹麦",
+  "Democratic Republic of the Congo": "刚果民主共和国",
   Senegal: "塞内加尔",
   Austria: "奥地利",
   Iran: "伊朗",
-  "Korea Republic": "韩国",
-  Australia: "澳大利亚",
-  Serbia: "塞尔维亚",
-  Poland: "波兰",
-  Turkey: "土耳其",
-  Ukraine: "乌克兰",
-  Canada: "加拿大",
+  Iraq: "伊拉克",
   Norway: "挪威",
-  Czechia: "捷克",
   Egypt: "埃及",
-  Algeria: "阿尔及利亚",
-  Nigeria: "尼日利亚",
   Panama: "巴拿马",
-  Paraguay: "巴拉圭",
-  Chile: "智利",
-  Peru: "秘鲁",
-  Qatar: "卡塔尔",
   "Saudi Arabia": "沙特阿拉伯",
+  Jordan: "约旦",
+  Uzbekistan: "乌兹别克斯坦",
   Ghana: "加纳",
-  "Costa Rica": "哥斯达黎加",
   "New Zealand": "新西兰",
   Draw: "平局"
 };
@@ -133,12 +133,20 @@ const cityLabels: Record<string, string> = {
   Seattle: "西雅图",
   Atlanta: "亚特兰大",
   "San Francisco Bay Area": "旧金山湾区",
+  "San Francisco Bay Area (Santa Clara)": "旧金山湾区",
   Houston: "休斯敦",
   Boston: "波士顿",
+  "Boston (Foxborough)": "波士顿",
   Toronto: "多伦多",
   "Kansas City": "堪萨斯城",
   Guadalajara: "瓜达拉哈拉",
-  Monterrey: "蒙特雷"
+  "Guadalajara (Zapopan)": "瓜达拉哈拉",
+  Monterrey: "蒙特雷",
+  "Monterrey (Guadalupe)": "蒙特雷",
+  "Miami (Miami Gardens)": "迈阿密",
+  "Los Angeles (Inglewood)": "洛杉矶",
+  "Dallas (Arlington, Texas)": "达拉斯",
+  "New York/New Jersey (East Rutherford)": "纽约/新泽西"
 };
 
 const factorLabels: Record<string, string> = {
@@ -147,6 +155,11 @@ const factorLabels: Record<string, string> = {
   "Humid, possible late showers": "湿度较高，末段可能有阵雨",
   "Indoor controlled conditions": "室内球场，环境变量较少",
   "Hot and humid": "炎热潮湿，体能衰减更关键",
+  "赛程真实；天气为赛前通用估计，临场需接天气源确认": "赛程已接入真实表；天气仍需临场数据确认",
+  "赛程真实；东部赛区湿热和晚场节奏需临场确认": "赛程已接入真实表；东部赛区湿热和晚场节奏需临场确认",
+  "赛程真实；西部赛区旅行距离和开球时间影响更大": "赛程已接入真实表；西部赛区旅行距离和开球时间影响更大",
+  "赛程真实；临场天气待接入": "赛程已接入真实表；临场天气待接入",
+  "Knockout participants are not known yet": "淘汰赛对阵等待小组赛/晋级结果",
   "Mexico altitude familiarity": "墨西哥更熟悉高海拔环境",
   "South Africa compact low block": "南非低位防守压缩空间",
   "Germany expected to rotate front line": "德国锋线可能轮换",
@@ -163,6 +176,10 @@ const factorLabels: Record<string, string> = {
 
 function cnTeam(name: string) {
   return teamNameLabels[name] ?? name;
+}
+
+function isSlotTeam(teamId: string) {
+  return teamId.startsWith("slot-");
 }
 
 function cnStage(stage: string) {
@@ -235,6 +252,7 @@ function getMatchResult(match: Match) {
 }
 
 function getTopPick(match: Match, prediction?: PredictionSnapshot) {
+  if (isSlotTeam(match.homeTeam.id) || isSlotTeam(match.awayTeam.id)) return { label: "等待晋级结果", value: 0 };
   if (!prediction) return { label: "暂无预测", value: 0 };
   const picks = [
     { label: cnTeam(match.homeTeam.name), value: prediction.homeWinProbability },
@@ -249,8 +267,10 @@ function sortByUserPriority(matches: Match[]) {
   return [...matches].sort((a, b) => {
     const aTime = new Date(a.kickoff).getTime();
     const bTime = new Date(b.kickoff).getTime();
-    const aRank = a.status === "live" ? 0 : a.status === "scheduled" ? 1 : 2;
-    const bRank = b.status === "live" ? 0 : b.status === "scheduled" ? 1 : 2;
+    const aNear = Math.abs(aTime - now) <= 72 * 60 * 60 * 1000;
+    const bNear = Math.abs(bTime - now) <= 72 * 60 * 60 * 1000;
+    const aRank = a.status === "live" ? 0 : aNear && a.status === "scheduled" ? 1 : aNear && a.status === "final" ? 2 : a.status === "scheduled" ? 3 : 4;
+    const bRank = b.status === "live" ? 0 : bNear && b.status === "scheduled" ? 1 : bNear && b.status === "final" ? 2 : b.status === "scheduled" ? 3 : 4;
     if (aRank !== bRank) return aRank - bRank;
     return Math.abs(aTime - now) - Math.abs(bTime - now);
   });
@@ -314,6 +334,10 @@ function MatchFocusCard({
 }
 
 function PredictionBars({ prediction }: { prediction?: PredictionSnapshot }) {
+  if (!prediction) {
+    return <div className="empty-state compact">这场比赛等待真实球队或模型数据，暂不生成预测。</div>;
+  }
+
   const rows = [
     { label: "主胜", value: prediction?.homeWinProbability ?? 0, tone: "home" },
     { label: "平局", value: prediction?.drawProbability ?? 0, tone: "draw" },
@@ -387,34 +411,34 @@ function ComparisonRow({
 
 export default function Page() {
   const [data, setData] = useState<DashboardData>(initialData);
-  const [selectedMatchId, setSelectedMatchId] = useState(initialData.matches[1]?.id ?? initialData.matches[0].id);
+  const [selectedMatchId, setSelectedMatchId] = useState(initialData.matches.find((match) => match.status === "scheduled")?.id ?? initialData.matches[0].id);
   const [stage, setStage] = useState("All");
   const [team, setTeam] = useState("All");
   const [timezone, setTimezone] = useState("Asia/Shanghai");
   const [query, setQuery] = useState("");
   const [busyAction, setBusyAction] = useState<"odds" | "predictions" | null>(null);
-  const [notice, setNotice] = useState(isStaticDemo ? "在线演示版已载入缓存赔率和模型预测" : "已载入缓存赔率，正在检查实时赔率源");
+  const [notice, setNotice] = useState(isStaticDemo ? "已载入真实赛程；等待真实赔率源" : "已载入真实赛程，正在检查实时赔率源");
   const [mounted, setMounted] = useState(false);
 
   async function loadData(nextNotice?: string) {
     if (isStaticDemo) {
-      setNotice(nextNotice ?? "在线演示版使用随代码发布的缓存赔率和模型预测");
+      setNotice(nextNotice ?? "在线演示版使用真实赛程快照；赔率需接入实时数据源");
       return;
     }
 
     const response = await fetch("/api/data", { cache: "no-store" });
     if (!response.ok) {
-      setNotice("实时数据暂时不可用，继续展示缓存赔率");
+      setNotice("实时赔率暂时不可用，继续展示真实赛程和模型预测");
       return;
     }
     const nextData = (await response.json()) as DashboardData;
     setData(nextData);
-    setNotice(nextNotice ?? (nextData.odds.some((item) => item.source === "the-odds-api") ? "已接入实时赔率" : "当前使用缓存赔率演示"));
+    setNotice(nextNotice ?? (nextData.odds.some((item) => item.source === "the-odds-api") ? "已接入实时赔率" : "已载入真实赛程；暂无真实赔率"));
   }
 
   async function runJob(kind: "odds" | "predictions") {
     if (isStaticDemo) {
-      setNotice(kind === "odds" ? "在线演示版不能直接刷新赔率；推送新数据后页面会自动更新" : "在线演示版不能直接重跑预测；推送新预测后页面会自动更新");
+      setNotice(kind === "odds" ? "在线演示版不能直接刷新赔率；需配置真实赔率源" : "在线演示版不能直接重跑预测；推送新模型后页面会自动更新");
       return;
     }
 
@@ -442,16 +466,18 @@ export default function Page() {
   const selectedBets = data.bets.filter((item) => item.matchId === selectedMatch.id);
   const selectedTopPick = getTopPick(selectedMatch, selectedPrediction);
 
-  const focusMatches = useMemo(() => sortByUserPriority(data.matches).slice(0, 4), [data.matches]);
+  const focusMatches = useMemo(() => sortByUserPriority(data.matches).slice(0, 12), [data.matches]);
   const rankingBets = useMemo(() => [...data.bets].sort((a, b) => b.profit - a.profit).slice(0, 6), [data.bets]);
 
   const filteredMatches = useMemo(() => {
     return sortByUserPriority(data.matches).filter((match) => {
       const stageMatch = stage === "All" || match.stage === stage;
-      const teamMatch = team === "All" || match.homeTeam.name === team || match.awayTeam.name === team || match.group === team;
+      const teamMatch = team === "All" || match.homeTeam.name === team || match.awayTeam.name === team || match.group === team || match.homeTeam.id === team || match.awayTeam.id === team;
       const haystack = [
         match.homeTeam.name,
         match.awayTeam.name,
+        match.homeTeam.shortName,
+        match.awayTeam.shortName,
         cnTeam(match.homeTeam.name),
         cnTeam(match.awayTeam.name),
         match.city,
@@ -467,7 +493,7 @@ export default function Page() {
   }, [data.matches, stage, team, query]);
 
   const filterValues = data.matches
-    .flatMap((match) => [match.homeTeam.name, match.awayTeam.name, match.group])
+    .flatMap((match) => [match.homeTeam, match.awayTeam].filter((item) => !isSlotTeam(item.id)).map((item) => item.name).concat(match.group))
     .filter((value, index, array) => array.indexOf(value) === index);
 
   const chartData = data.performance.equityCurve;
@@ -552,16 +578,20 @@ export default function Page() {
             <small>最新 {formatRefresh(data.lastRefresh, timezone)}</small>
           </div>
           <div className="leaderboard-list">
-            {rankingBets.map((bet, index) => (
-              <div key={bet.id} className="leaderboard-row">
-                <span className="rank-badge">{rankText(index)}</span>
-                <div>
-                  <strong>{cnTeam(bet.selection)}</strong>
-                  <small>{bet.bookmaker} · {betStatusLabels[bet.status]}</small>
+            {rankingBets.length > 0 ? (
+              rankingBets.map((bet, index) => (
+                <div key={bet.id} className="leaderboard-row">
+                  <span className="rank-badge">{rankText(index)}</span>
+                  <div>
+                    <strong>{cnTeam(bet.selection)}</strong>
+                    <small>{bet.bookmaker} · {betStatusLabels[bet.status]}</small>
+                  </div>
+                  <b className={bet.profit >= 0 ? "positive" : "negative"}>{signedMoney(bet.profit)}</b>
                 </div>
-                <b className={bet.profit >= 0 ? "positive" : "negative"}>{signedMoney(bet.profit)}</b>
-              </div>
-            ))}
+              ))
+            ) : (
+              <div className="empty-state compact">暂无真实赔率，收益榜等待盘口数据接入后生成。</div>
+            )}
           </div>
         </section>
 
@@ -605,7 +635,9 @@ export default function Page() {
               <div className="decision-card">
                 <small>模型建议</small>
                 <strong>{selectedTopPick.label}</strong>
-                <span>胜出概率 {percent(selectedTopPick.value)}，最可能比分 {selectedPrediction?.mostLikelyScore ?? "—"}</span>
+                <span>
+                  {selectedPrediction ? `胜出概率 ${percent(selectedTopPick.value)}，最可能比分 ${selectedPrediction.mostLikelyScore}` : "待定球队或数据不足时不生成预测"}
+                </span>
               </div>
 
               <PredictionBars prediction={selectedPrediction} />
@@ -631,11 +663,15 @@ export default function Page() {
                   价值赔率
                 </h4>
                 <div className="odds-chips">
-                  {selectedFair.slice(0, 5).map((item) => (
-                    <span key={`${item.outcome}-${item.bookmaker}`}>
-                      {cnTeam(item.outcome)} <b>{item.decimalOdds.toFixed(2)}</b>
-                    </span>
-                  ))}
+                  {selectedFair.length > 0 ? (
+                    selectedFair.slice(0, 5).map((item) => (
+                      <span key={`${item.outcome}-${item.bookmaker}`}>
+                        {cnTeam(item.outcome)} <b>{item.decimalOdds.toFixed(2)}</b>
+                      </span>
+                    ))
+                  ) : (
+                    <span>等待真实赔率源</span>
+                  )}
                 </div>
               </div>
 
@@ -645,7 +681,7 @@ export default function Page() {
                   影响因素
                 </h4>
                 <ul className="plain-list">
-                  {selectedPrediction?.topFactors.map((factor) => <li key={factor}>{cnFactor(factor)}</li>)}
+                  {(selectedPrediction?.topFactors ?? selectedMatch.newsSignals.map((signal) => signal.label)).map((factor) => <li key={factor}>{cnFactor(factor)}</li>)}
                 </ul>
               </div>
             </aside>
@@ -718,21 +754,25 @@ export default function Page() {
           </div>
 
           <div className="ticket-list">
-            {data.bets.slice(0, 5).map((bet) => (
-              <div key={bet.id} className="ticket-row">
-                <div>
-                  <span className={`status-badge ${bet.status}`}>{betStatusLabels[bet.status]}</span>
-                  <h3>{cnTeam(bet.selection)}</h3>
-                  <p>{bet.bookmaker} · 胜平负 · {bet.placedAt.slice(0, 10)}</p>
+            {data.bets.length > 0 ? (
+              data.bets.slice(0, 5).map((bet) => (
+                <div key={bet.id} className="ticket-row">
+                  <div>
+                    <span className={`status-badge ${bet.status}`}>{betStatusLabels[bet.status]}</span>
+                    <h3>{cnTeam(bet.selection)}</h3>
+                    <p>{bet.bookmaker} · 胜平负 · {bet.placedAt.slice(0, 10)}</p>
+                  </div>
+                  <div className="ticket-numbers">
+                    <span>本金 {bet.stake.toFixed(0)}</span>
+                    <span>赔率 {bet.decimalOdds.toFixed(2)}</span>
+                    <span>边际 {percent(bet.edge)}</span>
+                    <strong className={bet.profit >= 0 ? "positive" : "negative"}>{signedMoney(bet.profit)}</strong>
+                  </div>
                 </div>
-                <div className="ticket-numbers">
-                  <span>本金 {bet.stake.toFixed(0)}</span>
-                  <span>赔率 {bet.decimalOdds.toFixed(2)}</span>
-                  <span>边际 {percent(bet.edge)}</span>
-                  <strong className={bet.profit >= 0 ? "positive" : "negative"}>{signedMoney(bet.profit)}</strong>
-                </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <div className="empty-state">收益模块只接真实赔率。当前没有可用盘口，因此不生成模拟投注。</div>
+            )}
           </div>
         </section>
 
