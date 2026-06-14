@@ -13,3 +13,4 @@ __pycache__
 *.sqlite
 *.db
 tsconfig.tsbuildinfo
+.deploy-gh-pages
